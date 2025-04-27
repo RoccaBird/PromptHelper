@@ -8,7 +8,6 @@
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         margin: 20px;
-        padding: 0;
         background-color: #f9f9f9;
       }
       h1 {
@@ -72,43 +71,62 @@
 
     <div id="page2" class="hidden">
       <h1>Feinere Auswahl</h1>
-      <label>Bereich:</label>
-      <select id="bereich" onchange="updateSubbereich()">
-        <option value="IT">IT</option>
-        <option value="Marketing">Marketing</option>
-        <option value="Business">Business</option>
-        <option value="Kreativ">Kreativ</option>
-        <option value="Coding">Coding</option>
-      </select>
 
-      <label>Unterkategorie:</label>
-      <select id="unterbereich" onchange="setDefaultRole()"></select>
+      <div id="bereich-container">
+        <label>Bereich:</label>
+        <select id="bereich" onchange="updateSubbereich()">
+          <option value="IT">IT</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Business">Business</option>
+          <option value="Kreativ">Kreativ</option>
+          <option value="Coding">Coding</option>
+        </select>
+      </div>
 
-      <label>Expertenrolle:</label>
-      <input type="text" id="rolle" />
+      <div id="unterbereich-container">
+        <label>Unterkategorie:</label>
+        <select id="unterbereich" onchange="setDefaultRole()"></select>
+      </div>
 
-      <label>Aufgabe:</label>
-      <textarea id="aufgabe"></textarea>
+      <div id="rolle-container">
+        <label>Expertenrolle:</label>
+        <input type="text" id="rolle" />
+      </div>
 
-      <label>Ziel:</label>
-      <textarea id="ziel"></textarea>
+      <div id="aufgabe-container">
+        <label>Aufgabe:</label>
+        <textarea id="aufgabe"></textarea>
+      </div>
 
-      <label>Format (Mehrfachauswahl):</label>
-      <select id="format" multiple>
-        <option value="Bulletpoints">Bulletpoints</option>
-        <option value="Tabelle">Tabelle</option>
-        <option value="JSON">JSON</option>
-        <option value="Fließtext">Fließtext</option>
-      </select>
+      <div id="ziel-container">
+        <label>Ziel:</label>
+        <textarea id="ziel"></textarea>
+      </div>
 
-      <label>Rahmenbedingungen:</label>
-      <textarea id="rahmen"></textarea>
+      <div id="format-container">
+        <label>Format (Mehrfachauswahl):</label>
+        <select id="format" multiple>
+          <option value="Bulletpoints">Bulletpoints</option>
+          <option value="Tabelle">Tabelle</option>
+          <option value="JSON">JSON</option>
+          <option value="Fließtext">Fließtext</option>
+        </select>
+      </div>
 
-      <label>Beispiele:</label>
-      <textarea id="beispiele"></textarea>
+      <div id="rahmen-container">
+        <label>Rahmenbedingungen:</label>
+        <textarea id="rahmen"></textarea>
+      </div>
 
-      <label>Wichtige Hinweise:</label>
-      <textarea id="hinweise"></textarea>
+      <div id="beispiele-container">
+        <label>Beispiele:</label>
+        <textarea id="beispiele"></textarea>
+      </div>
+
+      <div id="hinweise-container">
+        <label>Wichtige Hinweise:</label>
+        <textarea id="hinweise"></textarea>
+      </div>
 
       <button onclick="generatePrompt()">Prompt erstellen</button>
     </div>
@@ -195,22 +213,15 @@
       }
 
       function adjustFieldsByNeed() {
-        const ziel = document.getElementById("ziel").parentElement;
-        const rahmen = document.getElementById("rahmen").parentElement;
-        const beispiele = document.getElementById("beispiele").parentElement;
-        const hinweise = document.getElementById("hinweise").parentElement;
-
-        if (need === "schnell" || need === "egal") {
-          ziel.style.display = "none";
-          rahmen.style.display = "none";
-          beispiele.style.display = "none";
-          hinweise.style.display = "none";
-        } else {
-          ziel.style.display = "block";
-          rahmen.style.display = "block";
-          beispiele.style.display = "block";
-          hinweise.style.display = "block";
-        }
+        const fields = ["ziel", "rahmen", "beispiele", "hinweise"];
+        fields.forEach((id) => {
+          const container = document.getElementById(id + "-container");
+          if (need === "schnell" || need === "egal") {
+            container.style.display = "none";
+          } else {
+            container.style.display = "block";
+          }
+        });
       }
 
       function generatePrompt() {
@@ -230,23 +241,24 @@
           const beispiele = document.getElementById("beispiele").value;
           const hinweise = document.getElementById("hinweise").value;
 
-          if (ziel.trim() !== "") {
-            prompt += `\n\nZiel: ${ziel}`;
-          }
-          if (rahmen.trim() !== "") {
+          if (ziel.trim() !== "") prompt += `\n\nZiel: ${ziel}`;
+          if (rahmen.trim() !== "")
             prompt += `\n\nRahmenbedingungen: ${rahmen}`;
-          }
-          if (beispiele.trim() !== "") {
-            prompt += `\n\nBeispiele: ${beispiele}`;
-          }
-          if (hinweise.trim() !== "") {
+          if (beispiele.trim() !== "") prompt += `\n\nBeispiele: ${beispiele}`;
+          if (hinweise.trim() !== "")
             prompt += `\n\nWichtige Hinweise: ${hinweise}`;
-          }
         }
 
         document.getElementById("page2").classList.add("hidden");
         document.getElementById("page3").classList.remove("hidden");
         document.getElementById("fertigerPrompt").value = prompt;
+      }
+
+      function copyPrompt() {
+        const text = document.getElementById("fertigerPrompt");
+        text.select();
+        document.execCommand("copy");
+        alert("Prompt kopiert!");
       }
     </script>
   </body>
