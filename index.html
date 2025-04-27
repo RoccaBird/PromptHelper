@@ -230,19 +230,23 @@
           const beispiele = document.getElementById("beispiele").value;
           const hinweise = document.getElementById("hinweise").value;
 
-          prompt += `\n\nZiel: ${ziel}\n\nRahmenbedingungen: ${rahmen}\n\nBeispiele: ${beispiele}\n\nWichtige Hinweise: ${hinweise}`;
+          if (ziel.trim() !== "") {
+            prompt += `\n\nZiel: ${ziel}`;
+          }
+          if (rahmen.trim() !== "") {
+            prompt += `\n\nRahmenbedingungen: ${rahmen}`;
+          }
+          if (beispiele.trim() !== "") {
+            prompt += `\n\nBeispiele: ${beispiele}`;
+          }
+          if (hinweise.trim() !== "") {
+            prompt += `\n\nWichtige Hinweise: ${hinweise}`;
+          }
         }
 
         document.getElementById("page2").classList.add("hidden");
         document.getElementById("page3").classList.remove("hidden");
         document.getElementById("fertigerPrompt").value = prompt;
-      }
-
-      function copyPrompt() {
-        const text = document.getElementById("fertigerPrompt");
-        text.select();
-        document.execCommand("copy");
-        alert("Prompt kopiert!");
       }
     </script>
   </body>
