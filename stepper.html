@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PromptHelper - Stepper</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <ul class="stepper">
+      <li id="stepIndicator1" class="active">1. Bedarf</li>
+      <li id="stepIndicator2">2. Kontext</li>
+      <li id="stepIndicator3">3. Details</li>
+      <li id="stepIndicator4">4. Vorschau</li>
+    </ul>
+
+    <div class="progress-bar-background">
+      <div id="progress-bar" class="progress-bar-fill"></div>
+    </div>
+    <div
+      id="step-counter"
+      style="text-align: center; margin-top: 5px; font-weight: bold"
+    >
+      <!-- Hier wird "Schritt X von Y" angezeigt -->
+    </div>
+
+    <!-- Step 1: Bedarf -->
+    <div id="step1">
+      <h1>Was brauchst du?</h1>
+
+      <div id="bedarf-buttons">
+        <button class="primary-button" data-need="schnell">
+          Schnelle Info / kleine Aufgabe
+        </button>
+        <button class="primary-button" data-need="komplex">
+          Komplexe Aufgabe / genauere Antwort
+        </button>
+        <button class="primary-button" data-need="präzise">
+          Maximale Präzision und Kontrolle
+        </button>
+        <button class="primary-button" data-need="kreativ">
+          Kreative Ideen / Brainstorming
+        </button>
+      </div>
+
+      <br /><br />
+
+      <button
+        class="primary-button"
+        onclick="window.location.href='index.html'"
+      >
+        Zurück zur Startseite
+      </button>
+    </div>
+
+    <!-- Step 2: Kontext -->
+    <div id="step2" class="hidden">
+      <h1>Kontext</h1>
+
+      <div id="bereich-container">
+        <label>Bereich:</label>
+        <select id="bereich" onchange="updateSubbereich()">
+          <option value="IT">IT</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Business">Business</option>
+          <option value="Kreativ">Kreativ</option>
+          <option value="Coding">Coding</option>
+        </select>
+      </div>
+
+      <div id="unterbereich-container">
+        <label>Unterkategorie:</label>
+        <select id="unterbereich" onchange="setDefaultRole()"></select>
+      </div>
+
+      <div id="rolle-container">
+        <label>Expertenrolle:</label>
+        <input type="text" id="rolle" />
+        <small
+          >Generiere eine klare Rolle, z.B. "Marketing-Experte für
+          Kampagnenplanung".</small
+        >
+      </div>
+
+      <button onclick="goToStep(1)">Zurück zu Bedarf</button>
+      <button onclick="goToStep(3)">Weiter zu Details</button>
+    </div>
+
+    <!-- Step 3: Details -->
+    <div id="step3" class="hidden">
+      <h1>Details</h1>
+
+      <div id="aufgabe-container">
+        <label>Aufgabe:</label>
+        <textarea id="aufgabe"></textarea>
+        <small
+          >Formuliere die Aufgabe klar und konkret, damit die Antwort präzise
+          wird.</small
+        >
+      </div>
+
+      <div id="ziel-container">
+        <label>Ziel:</label>
+        <textarea
+          id="ziel"
+          placeholder="Beschreibe dein konkretes Ziel..."
+        ></textarea>
+        <small
+          >Was genau ist das gewünschte Ergebnis oder Ziel dieser
+          Aufgabe?</small
+        >
+      </div>
+
+      <div id="format-container">
+        <label>Format:</label><br />
+        <label
+          ><input type="checkbox" name="format" value="Bulletpoints" />
+          Bulletpoints</label
+        ><br />
+        <label
+          ><input type="checkbox" name="format" value="Tabelle" />
+          Tabelle</label
+        ><br />
+        <label><input type="checkbox" name="format" value="JSON" /> JSON</label
+        ><br />
+        <label
+          ><input type="checkbox" name="format" value="Fließtext" />
+          Fließtext</label
+        ><br />
+        <small
+          >Wähle ein oder mehrere Formate, wie die Antwort strukturiert sein
+          soll.</small
+        >
+      </div>
+
+      <div id="rahmen-muss-container">
+        <label>Rahmenbedingungen (MUSS verwendet werden):</label>
+        <textarea id="rahmen-muss"></textarea>
+        <small
+          >Welche Elemente sind Pflicht? (z.B. "Nur Microsoft 365 Lösungen
+          verwenden")</small
+        >
+      </div>
+
+      <div id="rahmen-vermeiden-container">
+        <label>Rahmenbedingungen (VERMEIDEN):</label>
+        <textarea id="rahmen-vermeiden"></textarea>
+        <small
+          >Was darf nicht passieren oder genutzt werden? (z.B. "Keine
+          Open-Source-Tools einsetzen")</small
+        >
+      </div>
+
+      <div id="beispiele-container">
+        <label>Beispiele:</label>
+        <textarea id="beispiele"></textarea>
+        <small>Gib Beispiele für gewünschte Antworten oder Ergebnisse.</small>
+      </div>
+
+      <div id="hinweise-container">
+        <label>Wichtige Hinweise:</label>
+        <textarea id="hinweise"></textarea>
+        <small
+          >Zusätzliche Informationen, die unbedingt beachtet werden
+          müssen.</small
+        >
+      </div>
+
+      <button onclick="goToStep(2)">Zurück zu Kontext</button>
+      <button onclick="generatePrompt()">Prompt erstellen</button>
+    </div>
+
+    <!-- Step 4: Vorschau -->
+    <div id="step4" class="hidden">
+      <h1>Vorschau & Export</h1>
+      <textarea id="fertigerPrompt" rows="15" readonly></textarea>
+      <button onclick="copyPrompt()">In Zwischenablage kopieren</button>
+      <button onclick="savePromptAsFile()">Als Datei speichern</button>
+      <button onclick="goToStep(3)">Zurück zu Details</button>
+      <button onclick="resetAll()">Neu starten</button>
+    </div>
+
+    <!-- Snackbar für Copy-Feedback -->
+    <div id="snackbar">Prompt kopiert!</div>
+
+    <script src="script-stepper.js"></script>
+  </body>
+</html>

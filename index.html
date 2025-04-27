@@ -3,263 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PromptHelper</title>
-    <style>
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin: 20px;
-        background-color: #f9f9f9;
-      }
-      h1 {
-        margin-bottom: 20px;
-        color: #333;
-      }
-      .hidden {
-        display: none;
-      }
-      button {
-        margin-top: 10px;
-        margin-right: 10px;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 8px;
-        background-color: #007bff;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      select,
-      textarea,
-      input[type="text"] {
-        width: 100%;
-        margin-top: 10px;
-        margin-bottom: 20px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 16px;
-      }
-      textarea {
-        resize: vertical;
-      }
-      @media (max-width: 600px) {
-        button {
-          width: 100%;
-          margin-right: 0;
-        }
-      }
-    </style>
+    <title>PromptHelper Startseite</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div id="page1">
-      <h1>Was brauchst du?</h1>
-      <button onclick="selectNeed('schnell')">
-        Schnelle Info / kleine Aufgabe
+    <h1>Willkommen beim PromptHelper</h1>
+    <div
+      id="generator-start-container"
+      style="text-align: center; margin-bottom: 20px"
+    >
+      <button id="startGeneratorButton" class="primary-button">
+        ➕ Neuen Prompt erstellen
       </button>
-      <button onclick="selectNeed('komplex')">
-        Komplexe Aufgabe / genauere Antwort
-      </button>
-      <button onclick="selectNeed('präzise')">
-        Maximale Präzision und Kontrolle
-      </button>
-      <button onclick="selectNeed('egal')">Egal, Hauptsache schnell</button>
     </div>
 
-    <div id="page2" class="hidden">
-      <h1>Feinere Auswahl</h1>
-
-      <div id="bereich-container">
-        <label>Bereich:</label>
-        <select id="bereich" onchange="updateSubbereich()">
-          <option value="IT">IT</option>
-          <option value="Marketing">Marketing</option>
-          <option value="Business">Business</option>
-          <option value="Kreativ">Kreativ</option>
-          <option value="Coding">Coding</option>
-        </select>
-      </div>
-
-      <div id="unterbereich-container">
-        <label>Unterkategorie:</label>
-        <select id="unterbereich" onchange="setDefaultRole()"></select>
-      </div>
-
-      <div id="rolle-container">
-        <label>Expertenrolle:</label>
-        <input type="text" id="rolle" />
-      </div>
-
-      <div id="aufgabe-container">
-        <label>Aufgabe:</label>
-        <textarea id="aufgabe"></textarea>
-      </div>
-
-      <div id="ziel-container">
-        <label>Ziel:</label>
-        <textarea id="ziel"></textarea>
-      </div>
-
-      <div id="format-container">
-        <label>Format (Mehrfachauswahl):</label>
-        <select id="format" multiple>
-          <option value="Bulletpoints">Bulletpoints</option>
-          <option value="Tabelle">Tabelle</option>
-          <option value="JSON">JSON</option>
-          <option value="Fließtext">Fließtext</option>
-        </select>
-      </div>
-
-      <div id="rahmen-container">
-        <label>Rahmenbedingungen:</label>
-        <textarea id="rahmen"></textarea>
-      </div>
-
-      <div id="beispiele-container">
-        <label>Beispiele:</label>
-        <textarea id="beispiele"></textarea>
-      </div>
-
-      <div id="hinweise-container">
-        <label>Wichtige Hinweise:</label>
-        <textarea id="hinweise"></textarea>
-      </div>
-
-      <button onclick="generatePrompt()">Prompt erstellen</button>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button
+        class="tab-button active"
+        id="favoritenTab"
+        onclick="showTab('favoriten')"
+      >
+        Favoriten
+      </button>
+      <button class="tab-button" id="historieTab" onclick="showTab('historie')">
+        Historie
+      </button>
     </div>
 
-    <div id="page3" class="hidden">
-      <h1>Dein fertiger Prompt</h1>
-      <textarea id="fertigerPrompt" rows="15"></textarea>
-      <button onclick="copyPrompt()">In Zwischenablage kopieren</button>
-      <button onclick="location.reload()">Neu starten</button>
+    <!-- Suchfeld -->
+    <div id="suchfeld-container">
+      <input
+        type="text"
+        id="suchfeld"
+        placeholder="Suchen..."
+        oninput="filterList()"
+      />
     </div>
 
-    <script>
-      let need = "";
+    <!-- Favoriten-Liste -->
+    <div id="favoritenBereich" class="tab-content">
+      <ul id="favoritenListe"></ul>
+    </div>
 
-      function selectNeed(selection) {
-        need = selection;
-        document.getElementById("page1").classList.add("hidden");
-        document.getElementById("page2").classList.remove("hidden");
-        updateSubbereich();
-        adjustFieldsByNeed();
-      }
+    <!-- Historie-Liste -->
+    <div id="historieBereich" class="tab-content hidden">
+      <ul id="historieListe"></ul>
+    </div>
+    <div id="snackbar"></div>
 
-      function updateSubbereich() {
-        const unterbereich = document.getElementById("unterbereich");
-        const bereich = document.getElementById("bereich").value;
-        let options = [];
-
-        if (bereich === "IT") {
-          options = [
-            "Microsoft",
-            "Security",
-            "On-Premise IT",
-            "Cloud allgemein",
-            "IT-Strategie",
-          ];
-        } else if (bereich === "Marketing") {
-          options = [
-            "Social Media",
-            "SEO / SEA",
-            "Kampagnenplanung",
-            "Branding / Design",
-            "Content Marketing",
-          ];
-        } else if (bereich === "Business") {
-          options = [
-            "Prozessoptimierung",
-            "Projektmanagement",
-            "Vertrieb",
-            "Personalmanagement",
-            "Business-Strategie",
-          ];
-        } else if (bereich === "Kreativ") {
-          options = [
-            "Grafikdesign",
-            "Storytelling",
-            "Ideenfindung",
-            "Content-Erstellung",
-            "Markenaufbau",
-          ];
-        } else if (bereich === "Coding") {
-          options = [
-            "Webentwicklung allgemein",
-            "App-Entwicklung",
-            "Scripting & Automatisierung",
-            "API-Integration",
-            "Datenverarbeitung",
-          ];
-        }
-
-        unterbereich.innerHTML = options
-          .map((opt) => `<option value="${opt}">${opt}</option>`)
-          .join("");
-        setDefaultRole();
-      }
-
-      function setDefaultRole() {
-        const bereich = document.getElementById("bereich").value;
-        const unterbereich = document.getElementById("unterbereich").value;
-        const rolleField = document.getElementById("rolle");
-
-        if (bereich && unterbereich) {
-          rolleField.value = `${bereich}-Experte für ${unterbereich}`;
-        }
-      }
-
-      function adjustFieldsByNeed() {
-        const fields = ["ziel", "rahmen", "beispiele", "hinweise"];
-        fields.forEach((id) => {
-          const container = document.getElementById(id + "-container");
-          if (need === "schnell" || need === "egal") {
-            container.style.display = "none";
-          } else {
-            container.style.display = "block";
-          }
-        });
-      }
-
-      function generatePrompt() {
-        const rolle = document.getElementById("rolle").value;
-        const aufgabe = document.getElementById("aufgabe").value;
-        const formatOptions = Array.from(
-          document.getElementById("format").selectedOptions
-        )
-          .map((opt) => opt.value)
-          .join(", ");
-
-        let prompt = `Rolle: ${rolle}\n\nAufgabe: ${aufgabe}\n\nFormat: ${formatOptions}`;
-
-        if (need === "komplex" || need === "präzise") {
-          const ziel = document.getElementById("ziel").value;
-          const rahmen = document.getElementById("rahmen").value;
-          const beispiele = document.getElementById("beispiele").value;
-          const hinweise = document.getElementById("hinweise").value;
-
-          if (ziel.trim() !== "") prompt += `\n\nZiel: ${ziel}`;
-          if (rahmen.trim() !== "")
-            prompt += `\n\nRahmenbedingungen: ${rahmen}`;
-          if (beispiele.trim() !== "") prompt += `\n\nBeispiele: ${beispiele}`;
-          if (hinweise.trim() !== "")
-            prompt += `\n\nWichtige Hinweise: ${hinweise}`;
-        }
-
-        document.getElementById("page2").classList.add("hidden");
-        document.getElementById("page3").classList.remove("hidden");
-        document.getElementById("fertigerPrompt").value = prompt;
-      }
-
-      function copyPrompt() {
-        const text = document.getElementById("fertigerPrompt");
-        text.select();
-        document.execCommand("copy");
-        alert("Prompt kopiert!");
-      }
-    </script>
+    <script src="script-home.js"></script>
   </body>
 </html>
