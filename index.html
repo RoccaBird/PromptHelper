@@ -128,6 +128,7 @@
         document.getElementById("page1").classList.add("hidden");
         document.getElementById("page2").classList.remove("hidden");
         updateSubbereich();
+        adjustFieldsByNeed();
       }
 
       function updateSubbereich() {
@@ -180,9 +181,9 @@
         unterbereich.innerHTML = options
           .map((opt) => `<option value="${opt}">${opt}</option>`)
           .join("");
-
         setDefaultRole();
       }
+
       function setDefaultRole() {
         const bereich = document.getElementById("bereich").value;
         const unterbereich = document.getElementById("unterbereich").value;
@@ -193,32 +194,44 @@
         }
       }
 
+      function adjustFieldsByNeed() {
+        const ziel = document.getElementById("ziel").parentElement;
+        const rahmen = document.getElementById("rahmen").parentElement;
+        const beispiele = document.getElementById("beispiele").parentElement;
+        const hinweise = document.getElementById("hinweise").parentElement;
+
+        if (need === "schnell" || need === "egal") {
+          ziel.style.display = "none";
+          rahmen.style.display = "none";
+          beispiele.style.display = "none";
+          hinweise.style.display = "none";
+        } else {
+          ziel.style.display = "block";
+          rahmen.style.display = "block";
+          beispiele.style.display = "block";
+          hinweise.style.display = "block";
+        }
+      }
+
       function generatePrompt() {
         const rolle = document.getElementById("rolle").value;
         const aufgabe = document.getElementById("aufgabe").value;
-        const ziel = document.getElementById("ziel").value;
         const formatOptions = Array.from(
           document.getElementById("format").selectedOptions
         )
           .map((opt) => opt.value)
           .join(", ");
-        const rahmen = document.getElementById("rahmen").value;
-        const beispiele = document.getElementById("beispiele").value;
-        const hinweise = document.getElementById("hinweise").value;
 
-        const prompt = `Rolle: ${rolle}
+        let prompt = `Rolle: ${rolle}\n\nAufgabe: ${aufgabe}\n\nFormat: ${formatOptions}`;
 
-Aufgabe: ${aufgabe}
+        if (need === "komplex" || need === "präzise") {
+          const ziel = document.getElementById("ziel").value;
+          const rahmen = document.getElementById("rahmen").value;
+          const beispiele = document.getElementById("beispiele").value;
+          const hinweise = document.getElementById("hinweise").value;
 
-Ziel: ${ziel}
-
-Format: ${formatOptions}
-
-Rahmenbedingungen: ${rahmen}
-
-Beispiele: ${beispiele}
-
-Wichtige Hinweise: ${hinweise}`;
+          prompt += `\n\nZiel: ${ziel}\n\nRahmenbedingungen: ${rahmen}\n\nBeispiele: ${beispiele}\n\nWichtige Hinweise: ${hinweise}`;
+        }
 
         document.getElementById("page2").classList.add("hidden");
         document.getElementById("page3").classList.remove("hidden");
