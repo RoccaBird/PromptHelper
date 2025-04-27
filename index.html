@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptHelper</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .hidden { display: none; }
+        button { margin-top: 10px; padding: 10px 20px; }
+        select, textarea, input[type=text] { width: 100%; margin-top: 10px; padding: 8px; }
+    </style>
+</head>
+<body>
+
+<div id="page1">
+    <h1>Was brauchst du?</h1>
+    <button onclick="selectNeed('schnell')">Schnelle Info / kleine Aufgabe</button>
+    <button onclick="selectNeed('komplex')">Komplexe Aufgabe / genauere Antwort</button>
+    <button onclick="selectNeed('präzise')">Maximale Präzision und Kontrolle</button>
+    <button onclick="selectNeed('egal')">Egal, Hauptsache schnell</button>
+</div>
+
+<div id="page2" class="hidden">
+    <h1>Feinere Auswahl</h1>
+    <label>Bereich:</label>
+    <select id="bereich" onchange="updateSubbereich()">
+        <option value="IT">IT</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Business">Business</option>
+        <option value="Kreativ">Kreativ</option>
+        <option value="Coding">Coding</option>
+    </select>
+
+    <label>Unterkategorie:</label>
+    <select id="unterbereich"></select>
+
+    <label>Expertenrolle:</label>
+    <input type="text" id="rolle">
+
+    <label>Aufgabe:</label>
+    <textarea id="aufgabe"></textarea>
+
+    <label>Ziel:</label>
+    <textarea id="ziel"></textarea>
+
+    <label>Format (Mehrfachauswahl):</label>
+    <select id="format" multiple>
+        <option value="Bulletpoints">Bulletpoints</option>
+        <option value="Tabelle">Tabelle</option>
+        <option value="JSON">JSON</option>
+        <option value="Fließtext">Fließtext</option>
+    </select>
+
+    <label>Rahmenbedingungen:</label>
+    <textarea id="rahmen"></textarea>
+
+    <label>Beispiele:</label>
+    <textarea id="beispiele"></textarea>
+
+    <label>Wichtige Hinweise:</label>
+    <textarea id="hinweise"></textarea>
+
+    <button onclick="generatePrompt()">Prompt erstellen</button>
+</div>
+
+<div id="page3" class="hidden">
+    <h1>Dein fertiger Prompt</h1>
+    <textarea id="fertigerPrompt" rows="15"></textarea>
+    <button onclick="copyPrompt()">In Zwischenablage kopieren</button>
+    <button onclick="location.reload()">Neu starten</button>
+</div>
+
+<script>
+let need = '';
+
+function selectNeed(selection) {
+    need = selection;
+    document.getElementById('page1').classList.add('hidden');
+    document.getElementById('page2').classList.remove('hidden');
+    updateSubbereich();
+}
+
+function updateSubbereich() {
+    const unterbereich = document.getElementById('unterbereich');
+    const bereich = document.getElementById('bereich').value;
+    let options = [];
+
+    if (bereich === 'IT') {
+        options = ['Microsoft', 'Security', 'On-Premise IT', 'Cloud allgemein', 'IT-Strategie'];
+    } else if (bereich === 'Marketing') {
+        options = ['Social Media', 'SEO / SEA', 'Kampagnenplanung', 'Branding / Design', 'Content Marketing'];
+    } else if (bereich === 'Business') {
+        options = ['Prozessoptimierung', 'Projektmanagement', 'Vertrieb', 'Personalmanagement', 'Business-Strategie'];
+    } else if (bereich === 'Kreativ') {
+        options = ['Grafikdesign', 'Storytelling', 'Ideenfindung', 'Content-Erstellung', 'Markenaufbau'];
+    } else if (bereich === 'Coding') {
+        options = ['Webentwicklung allgemein', 'App-Entwicklung', 'Scripting & Automatisierung', 'API-Integration', 'Datenverarbeitung'];
+    }
+
+    unterbereich.innerHTML = options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+}
+
+function generatePrompt() {
+    const rolle = document.getElementById('rolle').value;
+    const aufgabe = document.getElementById('aufgabe').value;
+    const ziel = document.getElementById('ziel').value;
+    const formatOptions = Array.from(document.getElementById('format').selectedOptions).map(opt => opt.value).join(', ');
+    const rahmen = document.getElementById('rahmen').value;
+    const beispiele = document.getElementById('beispiele').value;
+    const hinweise = document.getElementById('hinweise').value;
+
+    const prompt = `Handle als ${rolle}.
+
+Aufgabe: ${aufgabe}.
+
+Ziel: ${ziel}.
+
+Format: ${formatOptions}.
+
+Rahmenbedingungen: ${rahmen}.
+
+Beispiele: ${beispiele}.
+
+Wichtige Hinweise: ${hinweise}.`;
+
+    document.getElementById('page2').classList.add('hidden');
+    document.getElementById('page3').classList.remove('hidden');
+    document.getElementById('fertigerPrompt').value = prompt;
+}
+
+function copyPrompt() {
+    const text = document.getElementById('fertigerPrompt');
+    text.select();
+    document.execCommand('copy');
+    alert('Prompt kopiert!');
+}
+</script>
+
+</body>
+</html>
