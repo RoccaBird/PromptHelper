@@ -175,24 +175,20 @@
         const rahmen = document.getElementById("rahmen").value;
         const beispiele = document.getElementById("beispiele").value;
         const hinweise = document.getElementById("hinweise").value;
-        const bereich = document.getElementById("bereich").value;
-        const unterbereich = document.getElementById("unterbereich").value;
 
-        const prompt = `Bereich: ${bereich} → Unterkategorie: ${unterbereich}
+        const prompt = `Rolle: ${rolle}
 
-Handle als ${rolle}.
+Aufgabe: ${aufgabe}
 
-Aufgabe: ${aufgabe}.
+Ziel: ${ziel}
 
-Ziel: ${ziel}.
+Format: ${formatOptions}
 
-Format: ${formatOptions}.
+Rahmenbedingungen: ${rahmen}
 
-Rahmenbedingungen: ${rahmen}.
+Beispiele: ${beispiele}
 
-Beispiele: ${beispiele}.
-
-Wichtige Hinweise: ${hinweise}.`;
+Wichtige Hinweise: ${hinweise}`;
 
         document.getElementById("page2").classList.add("hidden");
         document.getElementById("page3").classList.remove("hidden");
